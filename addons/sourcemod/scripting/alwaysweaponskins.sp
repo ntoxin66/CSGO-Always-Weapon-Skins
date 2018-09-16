@@ -340,7 +340,7 @@ public Action OnPostWeaponEquip(int client, int weapon)
 		return Plugin_Continue;
 	}
 	
-	// remake weapon string for m4a1_silencer, usp_silencer, cz75a and revolver
+	// Remake weapon string for m4a1_silencer, usp_silencer, cz75a, revolver and mp5sd
 	char classname[64];
 	switch (itemdefinition)
 	{
@@ -367,6 +367,12 @@ public Action OnPostWeaponEquip(int client, int weapon)
 			if (s_bDebugMessages)
 				PrintToConsole(client, "[SM] -> Index 64: Classname reset to: weapon_revolver from: %s", classname);
 			classname = "weapon_revolver";
+		}
+		case 23:
+		{
+			if (s_bDebugMessages)
+				PrintToConsole(client, "[SM] -> Index 23: Classname reset to: weapon_mp5sd from: %s", classname);
+			classname = "weapon_mp5sd";
 		}
 		default:
 		{
