@@ -224,22 +224,24 @@ public void OnClientDisconnect(int client)
 
 public MRESReturn OnGiveNamedItemPre(int client, Handle hReturn, Handle hParams)
 {
+	char classname[64];
+	DHookGetParamString(hParams, 1, classname, sizeof(classname));
+	if (s_bDebugMessages)
+		PrintToConsole(client, "[AWS] OnGiveNamedItemPre(int client, char[] classname='%s')", classname);
+		
 	if (!s_bEnable)
 	{
 		if (s_bDebugMessages)
-			PrintToConsole(client, "[AWS] -> Plugin is disabled");
+			PrintToConsole(client, "[AWS] -> Plugin Disabled");
 		return MRES_Ignored;
 	}
 	
 	s_TeamWasSwitched = false;
 	s_HookInUse = true;
-	char classname[64];
-	DHookGetParamString(hParams, 1, classname, sizeof(classname));
-	
-	if (s_bDebugMessages)
-		PrintToConsole(client, "[AWS] OnGiveNamedItemPre(int client, char[] classname='%s')", classname);
 	
 	int itemdefinition = GetItemDefinitionByClassname(classname);
+	if (s_bDebugMessages)
+		PrintToConsole(client, "[AWS] -> Item Definition: %d", itemdefinition);
 	
 	if (itemdefinition == -1)
 		return MRES_Ignored;
@@ -248,39 +250,55 @@ public MRESReturn OnGiveNamedItemPre(int client, Handle hReturn, Handle hParams)
 		return MRES_Ignored;
 		
 	int weaponteam = GetWeaponTeamByItemDefinition(itemdefinition);
-	
 	if (s_bDebugMessages)
-		PrintToConsole(client, "[AWS] -> Item definition team: %d", weaponteam);
+	{
+		static char teamname[24];
+		GetCSTeamName(weaponteam, teamname, sizeof(teamname));
+		PrintToConsole(client, "[AWS] -> Item Team: %s", teamname);
+	}
 	
 	if (weaponteam == CS_TEAM_NONE)
 		return MRES_Ignored;
 		
 	s_OriginalClientTeam = GetEntProp(client, Prop_Data, "m_iTeamNum");
+	if (s_bDebugMessages)
+	{
+		static char teamname[24];
+		GetCSTeamName(s_OriginalClientTeam, teamname, sizeof(teamname));
+		PrintToConsole(client, "[AWS] -> Player Team: %s", teamname);
+	}
 	
 	if (s_OriginalClientTeam == weaponteam)
 	{
 		if (s_bDebugMessages)
-			PrintToConsole(client, "[AWS] -> Skipped, player on correct team");
+			PrintToConsole(client, "[AWS] -> Skipped: Item and Player Teams match");
 		return MRES_Ignored;
 	}
 		
 	SetEntProp(client, Prop_Data, "m_iTeamNum", weaponteam);
 	s_TeamWasSwitched = true;
-	
 	if (s_bDebugMessages)
-		PrintToConsole(client, "[AWS] -> Player.m_iTeamNum set to %d", weaponteam);
+	{
+		static char teamname[24];
+		GetCSTeamName(weaponteam, teamname, sizeof(teamname));
+		PrintToConsole(client, "[AWS] -> Set Player Team: %s", teamname);
+	}
 	return MRES_Ignored;
 }
 
 public MRESReturn OnGiveNamedItemPost(int client, Handle hReturn, Handle hParams)
 {
 	if (s_bDebugMessages)
-		PrintToConsole(client, "[AWS] OnGiveNamedItemPost(int client, char[] classname)");
+	{
+		char classname[64];
+		DHookGetParamString(hParams, 1, classname, sizeof(classname));
+		PrintToConsole(client, "[AWS] OnGiveNamedItemPost(int client, char[] classname='%s')", classname);
+	}
 		
 	if (!s_bEnable)
 	{
 		if (s_bDebugMessages)
-			PrintToConsole(client, "[AWS] -> Plugin is disabled");
+			PrintToConsole(client, "[AWS] -> Plugin Disabled");
 		return MRES_Ignored;
 	}
 	
@@ -292,9 +310,13 @@ public MRESReturn OnGiveNamedItemPost(int client, Handle hReturn, Handle hParams
 	
 	s_TeamWasSwitched = false;
 	SetEntProp(client, Prop_Data, "m_iTeamNum", s_OriginalClientTeam);
-	
 	if (s_bDebugMessages)
-		PrintToConsole(client, "[AWS] -> Player.m_iTeamNum set to %d", s_OriginalClientTeam);
+	{
+		static char teamname[24];
+		GetCSTeamName(s_OriginalClientTeam, teamname, sizeof(teamname));
+		PrintToConsole(client, "[AWS] -> Set Player Team: %s", teamname);
+	}
+	
 	s_HookInUse = false;
 	return MRES_Ignored;
 }
@@ -310,14 +332,14 @@ public Action OnPostWeaponEquip(int client, int weapon)
 	if (!s_bEnable)
 	{
 		if (s_bDebugMessages)
-			PrintToConsole(client, "[AWS] -> Plugin is disabled");
+			PrintToConsole(client, "[AWS] -> Plugin Disabled");
 		return Plugin_Continue;
 	}
 	
 	if (s_bSkipMapWeapons)
 	{
 		if (s_bDebugMessages)
-			PrintToConsole(client, "[AWS] -> Skip Map Weapons is enabled");
+			PrintToConsole(client, "[AWS] -> Skipped: Convar aws_skipmapweapons is 1");
 		return Plugin_Continue;
 	}
 	
@@ -336,7 +358,7 @@ public Action OnPostWeaponEquip(int client, int weapon)
 	if (!IsMapWeapon(weapon, true))
 	{
 		if (s_bDebugMessages)
-			PrintToConsole(client, "[AWS] -> Skipped: IsMapWeapon(weapon=%d)==false", weapon);
+			PrintToConsole(client, "[AWS] -> Skipped: IsMapWeapon(weapon=%d) is false", weapon);
 		return Plugin_Continue;
 	}
 	
@@ -347,31 +369,31 @@ public Action OnPostWeaponEquip(int client, int weapon)
 		case 60:
 		{
 			if (s_bDebugMessages)
-				PrintToConsole(client, "[SM] -> Index 60: Classname reset to: weapon_m4a1_silencer from: %s", classname);
+				PrintToConsole(client, "[AWS] -> Index 60: Classname reset to: weapon_m4a1_silencer from: %s", classname);
 			classname = "weapon_m4a1_silencer";
 		}
 		case 61:
 		{
 			if (s_bDebugMessages)
-				PrintToConsole(client, "[SM] -> Index 61: Classname reset to: weapon_usp_silencer from: %s", classname);
+				PrintToConsole(client, "[AWS] -> Index 61: Classname reset to: weapon_usp_silencer from: %s", classname);
 			classname = "weapon_usp_silencer";
 		}
 		case 63:
 		{
 			if (s_bDebugMessages)
-				PrintToConsole(client, "[SM] -> Index 63: Classname reset to: weapon_cz75a from: %s", classname);
+				PrintToConsole(client, "[AWS] -> Index 63: Classname reset to: weapon_cz75a from: %s", classname);
 			classname = "weapon_cz75a";
 		}
 		case 64:
 		{
 			if (s_bDebugMessages)
-				PrintToConsole(client, "[SM] -> Index 64: Classname reset to: weapon_revolver from: %s", classname);
+				PrintToConsole(client, "[AWS] -> Index 64: Classname reset to: weapon_revolver from: %s", classname);
 			classname = "weapon_revolver";
 		}
 		case 23:
 		{
 			if (s_bDebugMessages)
-				PrintToConsole(client, "[SM] -> Index 23: Classname reset to: weapon_mp5sd from: %s", classname);
+				PrintToConsole(client, "[AWS] -> Index 23: Classname reset to: weapon_mp5sd from: %s", classname);
 			classname = "weapon_mp5sd";
 		}
 		default:
@@ -381,38 +403,47 @@ public Action OnPostWeaponEquip(int client, int weapon)
 	}
 	
 	if (s_bDebugMessages)
-		PrintToServer("[AWS] OnEntityClearedFromMapWeapons(entity=%d, classname=%s, mapweaponarraysize=%d)", weapon, classname, GetArraySize(s_hMapWeapons));
+		PrintToServer("[AWS] -> OnEntityClearedFromMapWeapons(entity=%d, classname=%s, mapweaponarraysize=%d)", weapon, classname, GetArraySize(s_hMapWeapons));
 	
 	// Skip if hosties is loaded and client is in last request
 	if (s_bHostiesLoaded)
+	{
 		if (IsClientInLastRequest(client))
+		{
+			if (s_bDebugMessages)
+				PrintToConsole(client, "[AWS] -> Skipped: Player is in LastRequest");
 			return Plugin_Continue;
+		}
+	}
 	
 	// Skip if previously owned
 	int m_hPrevOwner = GetEntProp(weapon, Prop_Send, "m_hPrevOwner");
 	if (m_hPrevOwner > 0)
 	{
 		if (s_bDebugMessages)
-			PrintToConsole(client, "[AWS] -> Skipped: m_hPrevOwner == %d", m_hPrevOwner);
+			PrintToConsole(client, "[AWS] -> Skipped: Weapon previously owned by %d", m_hPrevOwner);
 		return Plugin_Continue;
 	}
 		
 	// Skip if the weapon is named while CvarSkipNamedWeapons is enabled
 	if (s_bSkipNamedWeapons)
 	{
+		if (s_bDebugMessages)
+			PrintToConsole(client, "[AWS] -> Convar: aws_skipnamedweapons is 1");
+				
 		char entname[64];
 		GetEntPropString(weapon, Prop_Data, "m_iName", entname, sizeof(entname));
 		if (!StrEqual(entname, ""))
 		{
 			if (s_bDebugMessages)
-				PrintToConsole(client, "[AWS] -> Skipped: m_iName == %s", entname);
+				PrintToConsole(client, "[AWS] -> Skipped: Weapon has name '%s'", entname);
 			return Plugin_Continue;
 		}
 	}
 	
 	// Debug logging
 	if (s_bDebugMessages)
-		PrintToConsole(client, "[AWS] Respawning %s (defindex=%d)", classname, itemdefinition);
+		PrintToConsole(client, "[AWS] Respawning '%s' (definitionindex=%d)", classname, itemdefinition);
 	
 	// Processing weapon switch
 	// Remove current weapon from player
@@ -683,4 +714,30 @@ stock bool BuildItems()
 	} while (KvGotoNextKey(kv));
 
 	return true;
+}
+
+/***************************************************
+ * CS_TEAM HELPERS
+ **************************************************/
+stock void GetCSTeamName(int team, char[] buffer, int size)
+{
+	switch (team)
+	{
+		case CS_TEAM_NONE:
+		{
+			strcopy(buffer, size, "CS_TEAM_NONE");
+		}
+		case CS_TEAM_SPECTATOR:
+		{
+			strcopy(buffer, size, "CS_TEAM_SPECTATOR");
+		}
+		case CS_TEAM_T:
+		{
+			strcopy(buffer, size, "CS_TEAM_T");
+		}
+		case CS_TEAM_CT:
+		{
+			strcopy(buffer, size, "CS_TEAM_CT");
+		}
+	}
 }
