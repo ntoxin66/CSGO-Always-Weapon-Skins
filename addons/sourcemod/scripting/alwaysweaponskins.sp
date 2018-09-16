@@ -46,7 +46,7 @@ public Plugin myinfo =
 	name = "Always Weapon Skins",
 	author = "Neuro Toxin",
 	description = "Players always get their weapon skins!",
-	version = "2.2.6",
+	version = "2.2.7",
 	url = "https://forums.alliedmods.net/showthread.php?t=237114",
 }
 
