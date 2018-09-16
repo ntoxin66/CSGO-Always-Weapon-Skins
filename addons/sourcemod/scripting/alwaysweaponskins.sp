@@ -324,7 +324,8 @@ public Action OnPostWeaponEquip(int client, int weapon)
 	// Skip utilities
 	int itemdefinition = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
 	if (itemdefinition == 43 || itemdefinition == 44 || itemdefinition == 45 || 
-		itemdefinition == 46 || itemdefinition == 47 || itemdefinition == 48)
+		itemdefinition == 46 || itemdefinition == 47 || itemdefinition == 48 ||
+		itemdefinition == 57)
 	{
 		if (s_bDebugMessages)
 			PrintToConsole(client, "[AWS] -> Skipped: IsUtility(defindex=%d)", itemdefinition);
