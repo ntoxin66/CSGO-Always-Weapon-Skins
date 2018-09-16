@@ -16,7 +16,6 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include <dhooks>
 #include <cstrike>
 #include <sdktools_entinput>
