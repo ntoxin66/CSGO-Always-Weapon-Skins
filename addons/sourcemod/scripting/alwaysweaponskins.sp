@@ -46,7 +46,7 @@ public Plugin myinfo =
 	name = "Always Weapon Skins",
 	author = "Neuro Toxin",
 	description = "Players always get their weapon skins!",
-	version = "2.2.7",
+	version = "2.2.8",
 	url = "https://forums.alliedmods.net/showthread.php?t=237114",
 }
 
@@ -152,6 +152,7 @@ public bool HookOnGiveNamedItem()
 	DHookAddParam(s_hGiveNamedItemPost, HookParamType_Int, -1, DHookPass_ByVal);
 	DHookAddParam(s_hGiveNamedItemPost, HookParamType_Int, -1, DHookPass_ByVal);
 	DHookAddParam(s_hGiveNamedItemPost, HookParamType_Bool, -1, DHookPass_ByVal);
+	DHookAddParam(s_hGiveNamedItemPost, HookParamType_Unknown, -1, DHookPass_ByVal);
 	
 	/* PRE HOOK */
 	s_hGiveNamedItem = DHookCreate(offset, HookType_Entity, ReturnType_CBaseEntity, ThisPointer_CBaseEntity, OnGiveNamedItemPre);
@@ -166,6 +167,7 @@ public bool HookOnGiveNamedItem()
 	DHookAddParam(s_hGiveNamedItem, HookParamType_Int, -1, DHookPass_ByVal);
 	DHookAddParam(s_hGiveNamedItem, HookParamType_Int, -1, DHookPass_ByVal);
 	DHookAddParam(s_hGiveNamedItem, HookParamType_Bool, -1, DHookPass_ByVal);
+	DHookAddParam(s_hGiveNamedItem, HookParamType_Unknown, -1, DHookPass_ByVal);
 	return true;
 }
 
